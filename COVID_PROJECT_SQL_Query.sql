@@ -47,7 +47,6 @@ SELECT location
      ,total_cases
      ,(total_cases/population)*100 as CasesPercentage
 FROM CovidDeaths
---where location like '%states%'
 ORDER BY 1, 2;
 
 
@@ -94,17 +93,17 @@ ORDER BY 1,2
 -- 10
 -- Total Population vs Vaccinations
 
-SELECT dea.continent
-      ,dea.LOCATION
-      ,dea.DATE
-      ,dea.population
-      ,vac.new_vaccinations,
- SUM(convert(int,vac.new_vaccinations)) OVER (partition by dea.location order by dea.location, dea.DATE) as RollingPeopleVaccinated
-FROM [CovidProj].[dbo].[CovidDeaths] as dea
-JOIN [CovidProj].[dbo].[CovidVaccinations]  as vac
-    on dea.[location] = vac.location
-    and dea.[date] = vac.date
-WHERE dea.continent is not NULL
+SELECT ds.continent
+      ,ds.LOCATION
+      ,ds.DATE
+      ,ds.population
+      ,vs.new_vaccinations,
+ SUM(convert(int,vs.new_vaccinations)) OVER (partition by ds.location order by ds.location, ds.DATE) as RollingPeopleVaccinated
+FROM [CovidProj].[dbo].[CovidDeaths] as ds
+JOIN [CovidProj].[dbo].[CovidVaccinations]  as vs
+    on ds.[location] = vs.location
+    and ds.[date] = vs.date
+WHERE ds.continent is not NULL
 ORDER by 2,3 
 
 
@@ -119,17 +118,17 @@ WITH PopvsVac (continent
                ,RollingPeopleVaccinated)
 AS
 (
-SELECT dea.continent
-       ,dea.LOCATION
-       ,dea.DATE
-       ,dea.population
-       ,vac.new_vaccinations
-       ,SUM(convert(int,vac.new_vaccinations)) OVER (partition by dea.location order by dea.location, dea.DATE) as RollingPeopleVaccinated
-FROM [CovidProj].[dbo].[CovidDeaths] as dea
-JOIN [CovidProj].[dbo].[CovidVaccinations]  as vac
-    on dea.[location] = vac.location
-    and dea.[date] = vac.date
-WHERE dea.continent IS NOT NULL
+SELECT ds.continent
+       ,ds.LOCATION
+       ,ds.DATE
+       ,ds.population
+       ,vs.new_vaccinations
+       ,SUM(convert(int,vs.new_vaccinations)) OVER (partition by ds.location order by ds.location, ds.DATE) as RollingPeopleVaccinated
+FROM [CovidProj].[dbo].[CovidDeaths] as ds
+JOIN [CovidProj].[dbo].[CovidVaccinations]  as vs
+    on ds.[location] = vs.location
+    and ds.[date] = vs.date
+WHERE ds.continent IS NOT NULL
 )
 SELECT *
       ,(RollingPeopleVaccinated/population)* 100 as RollingPeoplePercentage
@@ -149,17 +148,17 @@ CREATE Table #PercentPopulationVaccinated
     RollingPeopleVaccinated NUMERIC
 )
 INSERT into #PercentPopulationVaccinated
-SELECT dea.continent
-       ,dea.LOCATION
-       ,dea.DATE
-       ,dea.population
-       ,vac.new_vaccinations
-       ,SUM(convert(int,vac.new_vaccinations)) OVER (partition by dea.location order by dea.location, dea.DATE) as RollingPeopleVaccinated
-FROM [CovidProj].[dbo].[CovidDeaths] as dea
-JOIN [CovidProj].[dbo].[CovidVaccinations]  as vac
-    on dea.[location] = vac.location
-    and dea.[date] = vac.date
-WHERE dea.continent IS NOT NULL
+SELECT ds.continent
+       ,ds.LOCATION
+       ,ds.DATE
+       ,ds.population
+       ,vs.new_vaccinations
+       ,SUM(convert(int,vs.new_vaccinations)) OVER (partition by ds.location order by ds.location, ds.DATE) as RollingPeopleVaccinated
+FROM [CovidProj].[dbo].[CovidDeaths] as ds
+JOIN [CovidProj].[dbo].[CovidVaccinations]  as vs
+    on ds.[location] = vs.location
+    and ds.[date] = vs.date
+WHERE ds.continent IS NOT NULL
 
 SELECT *
       ,(RollingPeopleVaccinated/population)* 100 as RollingPeoplePercentage
@@ -173,17 +172,17 @@ GO
 CREATE VIEW PercentPopulationVaccinated 
 AS
 SELECT 
-    dea.continent, 
-    dea.LOCATION, 
-    dea.DATE, 
-    dea.population, 
-    vac.new_vaccinations,
-    SUM(convert(int,vac.new_vaccinations)) OVER (partition by dea.location order by dea.location, dea.DATE) as RollingPeopleVaccinated
-FROM [CovidProj].[dbo].[CovidDeaths] as dea
-JOIN [CovidProj].[dbo].[CovidVaccinations]  as vac
-    on dea.[location] = vac.location
-    and dea.[date] = vac.date
-WHERE dea.continent is not NULL
+    ds.continent, 
+    ds.LOCATION, 
+    ds.DATE, 
+    ds.population, 
+    vs.new_vaccinations,
+    SUM(convert(int,vs.new_vaccinations)) OVER (partition by ds.location order by ds.location, ds.DATE) as RollingPeopleVaccinated
+FROM [CovidProj].[dbo].[CovidDeaths] as ds
+JOIN [CovidProj].[dbo].[CovidVaccinations]  as vs
+    on ds.[location] = vs.location
+    and ds.[date] = vs.date
+WHERE ds.continent is not NULL
 GO
 
 -- 14 
