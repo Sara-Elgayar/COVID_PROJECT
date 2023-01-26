@@ -1,4 +1,4 @@
-
+-- Author: Sara Elgayar
 -- 1. 
 -- Find the death percentage locally, location = 'egypt'
 
